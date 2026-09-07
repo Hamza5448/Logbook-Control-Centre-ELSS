@@ -47,6 +47,17 @@ Open:
 http://127.0.0.1:5000/
 ```
 
+### Deploy publicly with Render
+
+GitHub stores the source code but does not run the Flask application. To create
+a public link that works without the same Wi-Fi network, open Render, choose
+**New +** -> **Blueprint**, connect this repository, and select `render.yaml`.
+Render will install the dependencies and start the web service using Gunicorn.
+The generated `onrender.com` URL can then be shared with the team.
+
+The included SQLite database is suitable for this academic demonstration. A
+production deployment should use persistent storage or a managed database.
+
 ### Daily report email
 
 The application checks every 24 hours and emails all reports generated during
