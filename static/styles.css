@@ -44,6 +44,7 @@ form { display: grid; gap: 0.65rem; }
 .form-grid label { font-weight: 700; }
 input, select, textarea, button { font: inherit; }
 input, select, textarea { padding: 0.55rem; border: 1px solid var(--line); border-radius: 4px; width: 100%; }
+input[name$="_time"] { font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
 button, .button { display: inline-block; padding: 0.6rem 1rem; border: 0; border-radius: 4px; background: var(--blue); color: #fff; text-decoration: none; cursor: pointer; font-family: Arial, sans-serif; }
 .button-accent { background: var(--accent); color: var(--ink); }
 button:hover, .button:hover { filter: brightness(0.94); }

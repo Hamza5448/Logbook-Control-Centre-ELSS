@@ -14,7 +14,7 @@
     <label for="report_date">UTC date</label>
     <input id="report_date" name="report_date" type="date" required>
     <label for="report_time">UTC time</label>
-    <input id="report_time" name="report_time" type="time" required>
+    <input id="report_time" name="report_time" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}" placeholder="HH:MM" maxlength="5" required>
     <label for="location">Location</label>
     <input id="location" name="location" type="text" required placeholder="Representative fishing area">
     <label for="species">Species</label>
