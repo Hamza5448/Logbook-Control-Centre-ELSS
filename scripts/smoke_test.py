@@ -5,6 +5,7 @@ import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 
 def run_smoke_test() -> None:
@@ -32,6 +33,14 @@ def run_smoke_test() -> None:
     response = client.get("/reports/new")
     assert response.status_code == 200
     assert b"Create report" in response.data
+
+    response = client.post(
+        "/reports/new",
+        data={"report_type": "ELECTRONIC_LOGBOOK", "report_date": "2026-09-07", "report_time": "9:30"},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert b"UTC time must use HH:MM" in response.data
 
     response = client.post(
         "/reports/new",
@@ -99,6 +108,22 @@ def run_smoke_test() -> None:
     response = client.post("/reports/2/delete", follow_redirects=True)
     assert response.status_code == 200
     assert b"deleted" in response.data
+
+    with patch.dict(
+        os.environ,
+        {
+            "ELSS_SMTP_HOST": "smtp.test",
+            "ELSS_SMTP_PORT": "587",
+            "ELSS_SMTP_FROM": "sender@example.com",
+            "ELSS_REPORT_EMAIL": "chhamzaahmad6@gmail.com",
+        },
+    ), patch("app.smtplib.SMTP") as smtp_class:
+        smtp_class.return_value.__enter__.return_value = smtp_class.return_value
+        response = client.post("/reports/email-daily", follow_redirects=True)
+        assert response.status_code == 200
+        assert b"Daily report email sent" in response.data
+        smtp_class.assert_called_once_with("smtp.test", 587, timeout=20)
+        smtp_class.return_value.send_message.assert_called_once()
 
     response = client.get("/transmissions")
     assert response.status_code == 200

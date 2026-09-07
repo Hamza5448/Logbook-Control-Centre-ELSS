@@ -19,6 +19,8 @@ def format_utc(value: datetime | str | None) -> str:
 
 def parse_report_datetime(report_date: str, report_time: str) -> tuple[list[str], datetime | None]:
     errors: list[str] = []
+    if not re.fullmatch(r"\d{2}:\d{2}", report_time):
+        return ["UTC date must use YYYY-MM-DD and UTC time must use HH:MM."], None
     try:
         parsed = datetime.strptime(f"{report_date} {report_time}", "%Y-%m-%d %H:%M").replace(
             tzinfo=timezone.utc
