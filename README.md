@@ -66,9 +66,10 @@ Configure `ELSS_SECRET_KEY` and any SMTP variables in the Vercel project
 environment settings.
 
 Vercel is suitable for a quick demonstration, but its serverless filesystem is
-not persistent. The SQLite database may reset between deployments or function
-instances, and the 24-hour background email scheduler does not run reliably in
-serverless hosting. Use Render with persistent storage or a managed database
+not persistent. The Vercel runtime stores SQLite in `/tmp` so the application
+can start, but the database may reset between deployments or function
+instances. The 24-hour background email scheduler also does not run reliably
+in serverless hosting. Use Render with persistent storage or a managed database
 for shared long-term report data and scheduled email delivery.
 
 ### Daily report email

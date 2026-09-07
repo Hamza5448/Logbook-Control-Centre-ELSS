@@ -9,7 +9,14 @@ from flask import g
 from werkzeug.security import generate_password_hash
 
 
-DB_PATH = Path(os.environ.get("ELSS_DB", Path(__file__).resolve().parent.parent / "instance" / "elss.sqlite3"))
+DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "instance" / "elss.sqlite3"
+VERCEL_DB_PATH = Path("/tmp/elss.sqlite3")
+DB_PATH = Path(
+    os.environ.get(
+        "ELSS_DB",
+        VERCEL_DB_PATH if os.environ.get("VERCEL") else DEFAULT_DB_PATH,
+    )
+)
 
 
 def get_db() -> sqlite3.Connection:
