@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Trip Controls — ELSS{% endblock %}
+{% block content %}
+<h1>Trip Controls</h1>
+<section class="grid two">
+  <div class="card">
+    <h2>Trip state</h2>
+    <dl class="details">
+      <dt>Trip status</dt><dd>{{ trip.status }}</dd>
+      <dt>Vessel status</dt><dd>{{ trip.vessel_status }}</dd>
+      <dt>Catch on board</dt><dd>{{ 'YES' if trip.catch_on_board else 'NO' }}</dd>
+      <dt>Landing declaration</dt><dd>{{ 'SUBMITTED' if trip.landing_declaration_submitted else 'NOT SUBMITTED' }}</dd>
+      <dt>Current simulated UTC time</dt><dd>{{ utc_now }}</dd>
+      <dt>Daily transmission deadline</dt><dd>{{ frequency_state.deadline }}</dd>
+      <dt>Frequency rule</dt><dd><span class="badge">{{ frequency_state.state }}</span></dd>
+    </dl>
+    <p>{{ frequency_state.message }}</p>
+  </div>
+  <div class="card">
+    <h2>Controlled simulation actions</h2>
+    <div class="actions">
+      <form method="post"><input type="hidden" name="action" value="enter_port"><button type="submit">Enter Port</button></form>
+      <form method="post"><input type="hidden" name="action" value="leave_port"><button type="submit">Leave Port</button></form>
+      <form method="post"><input type="hidden" name="action" value="submit_landing_declaration"><button type="submit">Submit Landing Declaration</button></form>
+      <form method="post"><input type="hidden" name="action" value="last_fishing_operation"><button type="submit">Record Last Fishing Operation</button></form>
+      <form method="post"><input type="hidden" name="action" value="clear_catch"><button type="submit" class="secondary">Clear Catch On Board</button></form>
+    </div>
+    <h3>Advance simulation time</h3>
+    <form method="post" class="inline-form">
+      <input type="hidden" name="action" value="advance_time">
+      <label for="hours">Hours</label>
+      <input id="hours" name="hours" type="number" step="0.5" min="0.5" max="24" required>
+      <button type="submit">Advance</button>
+    </form>
+    <h3>Set simulation time</h3>
+    <form method="post" class="inline-form">
+      <input type="hidden" name="action" value="set_time">
+      <label for="simulated_date">Date</label>
+      <input id="simulated_date" name="simulated_date" type="date" required>
+      <label for="simulated_time">Time</label>
+      <input id="simulated_time" name="simulated_time" type="time" required>
+      <button type="submit">Set</button>
+    </form>
+  </div>
+</section>
+<section class="card">
+  <h2>Frequency-001 demonstration</h2>
+  <ol class="steps">
+    <li>Set the simulation time before 24:00 UTC while AT_SEA to observe <strong>DUE_BEFORE_DEADLINE</strong>.</li>
+    <li>Transmit an Electronic Logbook to observe <strong>SATISFIED_TODAY</strong>.</li>
+    <li>Enter Port, Clear Catch On Board, and Submit Landing Declaration to observe <strong>PORT_EXCEPTION_ACTIVE</strong>.</li>
+    <li>Leave Port to resume daily transmission checking.</li>
+  </ol>
+</section>
+{% endblock %}

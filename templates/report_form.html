@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Create report — ELSS{% endblock %}
+{% block content %}
+<h1>Create report</h1>
+<section class="card">
+  <form method="post" class="form-grid">
+    <label for="report_type">Report type</label>
+    <select id="report_type" name="report_type" required>
+      <option value="">Select report type</option>
+      {% for value, label in report_types.items() %}
+      <option value="{{ value }}">{{ label }}</option>
+      {% endfor %}
+    </select>
+    <label for="report_date">UTC date</label>
+    <input id="report_date" name="report_date" type="date" required>
+    <label for="report_time">UTC time</label>
+    <input id="report_time" name="report_time" type="time" required>
+    <label for="location">Location</label>
+    <input id="location" name="location" type="text" required placeholder="Representative fishing area">
+    <label for="species">Species</label>
+    <input id="species" name="species" type="text" placeholder="Required for Electronic Logbook">
+    <label for="catch_weight_kg">Catch weight (kg)</label>
+    <input id="catch_weight_kg" name="catch_weight_kg" type="number" step="0.01" min="0.01" placeholder="Required for Electronic Logbook">
+    <label for="port">Port</label>
+    <input id="port" name="port" type="text" placeholder="Required for Landing Declaration">
+    <label for="notes">Notes</label>
+    <textarea id="notes" name="notes" rows="3"></textarea>
+    <div></div><button type="submit">Validate and create report</button>
+  </form>
+</section>
+{% endblock %}

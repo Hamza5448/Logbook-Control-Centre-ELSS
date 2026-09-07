@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Transmission Monitor — ELSS{% endblock %}
+{% block content %}
+<h1>Transmission Monitor</h1>
+<section class="card">
+  {% if transmissions %}
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Report ID</th><th>Operation</th><th>Filename</th><th>Status</th><th>Transmission time (UTC)</th><th>Ack status</th><th>Correlation</th><th>Encryption</th><th></th></tr></thead>
+    <tbody>
+      {% for transmission in transmissions %}
+      <tr>
+        <td>{{ transmission.report_number }}</td><td>{{ transmission.operation }}</td><td>{{ transmission.report_filename }}</td>
+        <td><span class="badge">{{ transmission.transmission_status }}</span></td>
+        <td>{{ format_utc(transmission.sent_at_utc) }}</td><td>{{ transmission.ack_status }}</td>
+        <td>{{ transmission.correlation_status }}</td><td>{{ 'SUCCESS' if transmission.encrypted else 'NOT APPLIED' }}</td>
+        <td><a href="{{ url_for('transmission_detail', transmission_id=transmission.id) }}">Inspect</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}<p>No transmissions recorded.</p>{% endif %}
+</section>
+{% endblock %}

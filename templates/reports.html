@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Reports — ELSS{% endblock %}
+{% block content %}
+<section class="page-intro">
+  <div><p class="eyebrow">REPORT REGISTER</p><h1>Reports</h1><p class="lede">Every generated version, correction, and transmission in one place.</p></div>
+  <div class="actions"><form method="post" action="{{ url_for('email_daily_reports') }}"><button class="button-accent" type="submit">Send daily report</button></form><a class="button" href="{{ url_for('new_report') }}">+ New report</a></div>
+</section>
+<section class="card">
+  {% if reports %}
+  <table>
+    <thead><tr><th>Report ID</th><th>Type</th><th>Operation</th><th>Status</th><th>Created (UTC)</th><th></th></tr></thead>
+    <tbody>
+      {% for report in reports %}
+      <tr>
+        <td><strong>{{ report.report_number }}</strong><br><span class="subtle">{{ report.filename }}</span></td><td>{{ report.report_type|replace('_', ' ') }}</td><td><span class="operation {{ report.operation }}">{{ report.operation }}</span></td>
+        <td><span class="badge">{{ report.status }}</span></td><td>{{ format_utc(report.created_at_utc) }}</td>
+        <td class="table-actions"><a href="{{ url_for('report_detail', report_id=report.id) }}">Open</a><form method="post" action="{{ url_for('delete_report', report_id=report.id) }}" onsubmit="return confirm('Delete this report and its transmissions?');"><button class="link-button danger-text" type="submit">Delete</button></form></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p>No reports available.</p>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{{ report.report_number }} — ELSS{% endblock %}
+{% block content %}
+<section class="page-intro">
+  <div><p class="eyebrow">REPORT DETAIL / {{ report.operation }}</p><h1>{{ report.report_number }}</h1><p class="lede">Complete report payload and transmission history.</p></div>
+  <div class="actions"><span class="badge {{ report.status|lower }}">{{ report.status|replace('_', ' ') }}</span><form method="post" action="{{ url_for('delete_report', report_id=report.id) }}" onsubmit="return confirm('Delete this report and its transmissions?');"><button class="secondary" type="submit">Delete report</button></form></div>
+</section>
+{% if corrected_report %}
+<section class="callout correction-callout"><strong>Updated version available</strong><p>This report was corrected. The current version is <a href="{{ url_for('report_detail', report_id=corrected_report.id) }}">{{ corrected_report.report_number }}</a>, created {{ format_utc(corrected_report.created_at_utc) }}.</p></section>
+{% endif %}
+<section class="grid two">
+  <div class="card">
+    <h2>Report preview and validation</h2>
+    <dl class="details">
+      <dt>Report ID</dt><dd>{{ report.report_number }}</dd>
+      <dt>Message ID</dt><dd>{{ report.message_id }}</dd>
+      <dt>GBRRN</dt><dd>{{ report.filename[:-4] }}</dd>
+      <dt>Generated filename</dt><dd>{{ report.filename }}</dd>
+      <dt>UTC timestamp</dt><dd>{{ format_utc(report.created_at_utc) }}</dd>
+      <dt>Operation</dt><dd><span class="operation {{ report.operation }}">{{ report.operation }}</span></dd>
+      <dt>Validation</dt><dd><span class="badge success">VALID</span></dd>
+    </dl>
+    {% if report.status == 'VALIDATED' %}
+    <form method="post" action="{{ url_for('queue_report', report_id=report.id) }}">
+      <button type="submit">Queue for transmission</button>
+    </form>
+    {% endif %}
+    {% if report.operation == 'DAT' and report.status == 'ACKNOWLEDGED' %}<a class="button secondary" href="{{ url_for('create_correction', report_id=report.id) }}">Create correction</a>{% endif %}
+  </div>
+  <div class="card">
+    <h2>Controlled prototype XML</h2>
+    <p class="subtle">This XML is a controlled academic representation, not a claim of UK XSD conformance.</p>
+    <pre><code>{{ report.xml_content }}</code></pre>
+  </div>
+</section>
+<section class="card">
+  <h2>Transmissions</h2>
+  {% if transmissions %}
+  <table>
+    <thead><tr><th>Transmission</th><th>Status</th><th>Sent (UTC)</th><th>Ack</th><th>Correlation</th><th></th></tr></thead>
+    <tbody>
+      {% for transmission in transmissions %}
+      <tr>
+        <td>#{{ transmission.id }}</td><td>{{ transmission.transmission_status }}</td>
+        <td>{{ format_utc(transmission.sent_at_utc) }}</td><td>{{ transmission.ack_status }}</td>
+        <td>{{ transmission.correlation_status }}</td>
+        <td><a href="{{ url_for('transmission_detail', transmission_id=transmission.id) }}">Inspect</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p>No transmission queued for this report.</p>{% endif %}
+</section>
+{% endblock %}

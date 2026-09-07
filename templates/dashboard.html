@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — ELSS{% endblock %}
+{% block content %}
+<section class="page-intro">
+  <div>
+    <p class="eyebrow">OPERATIONS / TODAY</p>
+    <h1>Good day, {{ current_user.username }}.</h1>
+    <p class="lede">Keep the vessel logbook current, complete, and ready for transmission.</p>
+  </div>
+  <a class="button button-accent" href="{{ url_for('new_report') }}">+ New report</a>
+</section>
+<section class="metric-strip">
+  <div class="metric"><span>Vessel</span><strong>{{ trip.rss_number }}</strong><small>{{ trip.vessel_status }}</small></div>
+  <div class="metric"><span>Trip</span><strong>{{ trip.trip_number }}</strong><small>{{ 'Catch on board' if trip.catch_on_board else 'No catch on board' }}</small></div>
+  <div class="metric"><span>Daily rule</span><strong>{{ frequency_state.state|replace('_', ' ') }}</strong><small>{{ frequency_state.deadline }}</small></div>
+</section>
+<section class="grid two">
+  <div class="card accent-card">
+    <h2>Vessel and current trip</h2>
+    <dl class="details">
+      <dt>RSS Number</dt><dd>{{ trip.rss_number }}</dd>
+      <dt>Current trip</dt><dd>{{ trip.trip_number }}</dd>
+      <dt>Current UTC time</dt><dd>{{ utc_now }}</dd>
+      <dt>Vessel status</dt><dd>{{ trip.vessel_status }}</dd>
+      <dt>Catch on board</dt><dd>{{ 'YES' if trip.catch_on_board else 'NO' }}</dd>
+      <dt>Landing declaration</dt><dd>{{ 'SUBMITTED' if trip.landing_declaration_submitted else 'NOT SUBMITTED' }}</dd>
+    </dl>
+  </div>
+  <div class="card accent-card">
+    <h2>Transmission summary</h2>
+    <dl class="details">
+      <dt>Last transmission</dt>
+      <dd>
+        {% if latest_transmission %}
+          {{ latest_transmission.report_number }} · {{ latest_transmission.transmission_status }} · {{ format_utc(latest_transmission.sent_at_utc) }}
+        {% else %}No transmission recorded{% endif %}
+      </dd>
+      <dt>Pending acknowledgement</dt><dd>{{ pending_acknowledgement }}</dd>
+      <dt>Latest acknowledgement</dt>
+      <dd>
+        {% if latest_transmission and latest_transmission.ack_status != 'PENDING' %}
+          {{ latest_transmission.ack_status }} · {{ latest_transmission.correlation_status }}
+        {% else %}Not received{% endif %}
+      </dd>
+      <dt>Daily deadline</dt><dd>{{ frequency_state.deadline }}</dd>
+    </dl>
+    <div class="status {{ frequency_state.state }}">{{ frequency_state.state|replace('_', ' ') }}</div>
+    <p>{{ frequency_state.message }}</p>
+  </div>
+</section>
+<section class="card action-panel">
+  <h2>Quick actions</h2>
+  <div class="actions">
+    <a class="button" href="{{ url_for('new_report') }}">Create Report</a>
+    <a class="button secondary" href="{{ url_for('reports') }}">Reports</a>
+    <a class="button secondary" href="{{ url_for('corrections') }}">Corrections</a>
+    <a class="button secondary" href="{{ url_for('transmissions') }}">Transmission Monitor</a>
+    <a class="button secondary" href="{{ url_for('trip_controls') }}">Trip Controls</a>
+  </div>
+</section>
+<section class="card">
+  <h2>Recent reports</h2>
+  {% if reports %}
+  <table>
+    <thead><tr><th>Report ID</th><th>Type</th><th>Operation</th><th>Status</th><th>Filename</th><th></th></tr></thead>
+    <tbody>
+      {% for report in reports %}
+      <tr>
+        <td>{{ report.report_number }}</td><td>{{ report.report_type }}</td><td>{{ report.operation }}</td>
+        <td><span class="badge">{{ report.status }}</span></td><td>{{ report.filename }}</td>
+        <td><a href="{{ url_for('report_detail', report_id=report.id) }}">Open</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p>No reports created yet.</p>{% endif %}
+</section>
+{% endblock %}

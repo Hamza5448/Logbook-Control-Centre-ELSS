@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Sign in — ELSS{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Sign in</h1>
+  <form method="post">
+    <label for="username">Username</label>
+    <input id="username" name="username" type="text" autocomplete="username" required>
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <button type="submit">Sign in</button>
+  </form>
+  <div class="callout">
+    <strong>Demo credentials</strong>
+    <div>Username: <code>fisherman</code></div>
+    <div>Password: <code>elss-demo</code></div>
+  </div>
+</section>
+{% endblock %}

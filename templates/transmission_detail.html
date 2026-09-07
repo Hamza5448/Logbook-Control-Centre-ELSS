@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Transmission #{{ transmission.id }} — ELSS{% endblock %}
+{% block content %}
+<h1>Transmission #{{ transmission.id }}</h1>
+<section class="grid two">
+  <div class="card">
+    <h2>Transmission details</h2>
+    <dl class="details">
+      <dt>Report ID</dt><dd>{{ transmission.report_number }}</dd>
+      <dt>Message ID</dt><dd>{{ transmission.message_id }}</dd>
+      <dt>Operation</dt><dd>{{ transmission.operation }}</dd>
+      <dt>Filename</dt><dd>{{ transmission.report_filename }}</dd>
+      <dt>Transmission status</dt><dd><span class="badge">{{ transmission.transmission_status }}</span></dd>
+      <dt>Transmission time (UTC)</dt><dd>{{ format_utc(transmission.sent_at_utc) }}</dd>
+      <dt>Encryption</dt><dd>{{ 'SUCCESS — development-only key' if transmission.encrypted else 'NOT APPLIED' }}</dd>
+      <dt>Acknowledgement status</dt><dd>{{ transmission.ack_status }}</dd>
+      <dt>Acknowledgement ID</dt><dd>{{ transmission.ack_id or 'Not received' }}</dd>
+      <dt>Acknowledgement time (UTC)</dt><dd>{{ format_utc(transmission.ack_at_utc) }}</dd>
+      <dt>Correlation result</dt><dd>{{ transmission.correlation_status }}</dd>
+      <dt>Acknowledgement message</dt><dd>{{ transmission.ack_message or 'Not received' }}</dd>
+    </dl>
+    {% if transmission.transmission_status == 'PENDING' %}
+    <form method="post" action="{{ url_for('send_transmission', transmission_id=transmission.id) }}">
+      <button type="submit">Send to simulated ERS authority</button>
+    </form>
+    {% endif %}
+    {% if transmission.transmission_status in ['TRANSMITTED', 'ACKNOWLEDGED'] %}
+    <div class="actions">
+      <form method="post" action="{{ url_for('simulate_acknowledgement', transmission_id=transmission.id) }}">
+        <input type="hidden" name="ack_type" value="success"><button type="submit">Simulate Successful ACK</button>
+      </form>
+      <form method="post" action="{{ url_for('simulate_acknowledgement', transmission_id=transmission.id) }}">
+        <input type="hidden" name="ack_type" value="rejected"><button type="submit" class="warning">Simulate Rejected ACK</button>
+      </form>
+      <form method="post" action="{{ url_for('simulate_acknowledgement', transmission_id=transmission.id) }}">
+        <input type="hidden" name="ack_type" value="unmatched"><button type="submit" class="secondary">Simulate Unmatched ACK</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2>Encrypted attachment demonstration</h2>
+    <p class="subtle">The encrypted payload below is produced with a development-only test key. It is not a production UK Fisheries PGP key.</p>
+    {% if transmission.transmission_status == 'PENDING' %}
+    <div class="callout">Encryption will be applied before the simulated transmission is sent.</div>
+    {% endif %}
+    {% if transmission.encrypted_payload %}
+    <pre><code>{{ transmission.encrypted_payload }}</code></pre>
+    {% else %}<p>Encryption has not yet been applied.</p>{% endif %}
+  </div>
+</section>
+{% endblock %}
