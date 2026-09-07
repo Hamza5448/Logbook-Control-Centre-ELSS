@@ -58,6 +58,19 @@ The generated `onrender.com` URL can then be shared with the team.
 The included SQLite database is suitable for this academic demonstration. A
 production deployment should use persistent storage or a managed database.
 
+### Deploy with Vercel
+
+Vercel can run this Flask application through `api/index.py`. Import the
+GitHub repository into Vercel and deploy with the included `vercel.json`.
+Configure `ELSS_SECRET_KEY` and any SMTP variables in the Vercel project
+environment settings.
+
+Vercel is suitable for a quick demonstration, but its serverless filesystem is
+not persistent. The SQLite database may reset between deployments or function
+instances, and the 24-hour background email scheduler does not run reliably in
+serverless hosting. Use Render with persistent storage or a managed database
+for shared long-term report data and scheduled email delivery.
+
 ### Daily report email
 
 The application checks every 24 hours and emails all reports generated during
